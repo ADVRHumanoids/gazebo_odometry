@@ -4,6 +4,10 @@ This code publishes the odometry of the robot into a topic /gazebo_odom and into
 
 It's possible to setup the model name using a service or /gazebo/model_states topic which gives back the name of the robot.
 
+Useful link: 
+
+https://answers.ros.org/question/222033/how-do-i-publish-gazebo-position-of-a-robot-model-on-odometry-topic/
+
 ## How to run
 
 1) Run gazebo and the robot.
