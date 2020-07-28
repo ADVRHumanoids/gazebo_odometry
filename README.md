@@ -13,10 +13,11 @@ https://answers.ros.org/question/222033/how-do-i-publish-gazebo-position-of-a-ro
 1) Run gazebo and the robot.
 2) set the name if the /gazebo/model_states is not present using:
    i.e rosservice call /gazebo_odom/set_model_name "model_name: 'cogimon'"
-3) set the name of the link:
+3) set the name of the link of the odometry tf:
    i.e rosservice call /gazebo_odom/pub_odom_link "link_name: 'world'" 
-   
-4) Check the result on Rviz or using the topic:
+4) set the name of the link of the static odometry tf:
+   i.e rosservice call /gazebo_odom/pub_odom_static_link "link_name: 'ci/world'"
+5) Check the result on Rviz or using the topic:
    rostopic echo /gazebo_odom
 
   
