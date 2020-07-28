@@ -16,11 +16,17 @@
 
 using namespace std;
 
-std::string model_name="",link_requested="";
+std::string model_name="",link_requested="",cartesian_interface_link="";
 
 bool pub_odom_link(gazebo_odometry::LinkRequested::Request  &req, gazebo_odometry::LinkRequested::Response& res) {
 
  link_requested=req.link_name;
+ return true;
+}
+
+bool pub_odom_static_link(gazebo_odometry::LinkRequested::Request  &req, gazebo_odometry::LinkRequested::Response& res) {
+
+ cartesian_interface_link=req.link_name;
  return true;
 }
 
@@ -39,12 +45,13 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "odom_pub");
   ros::NodeHandle n;
-  ros::Publisher odom_pub               = n.advertise<nav_msgs::Odometry>("/gazebo_odom", 1000); 
-  ros::Subscriber sub_get_modelName     = n.subscribe("/gazebo/model_states", 1000, getmodelname);
-  ros::ServiceServer service_set_model  = n.advertiseService("gazebo_odom/set_model_name", set_model_name);
+  ros::Publisher odom_pub                     = n.advertise<nav_msgs::Odometry>("/gazebo_odom", 1000); 
+  ros::Subscriber sub_get_modelName           = n.subscribe("/gazebo/model_states", 1000, getmodelname);
+  ros::ServiceServer service_set_model        = n.advertiseService("gazebo_odom/set_model_name", set_model_name);
   
-  ros::ServiceClient get_model_srv      = n.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
-  ros::ServiceServer service_set_link   = n.advertiseService("gazebo_odom/pub_odom_link", pub_odom_link);
+  ros::ServiceClient get_model_srv            = n.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+  ros::ServiceServer service_set_link         = n.advertiseService("gazebo_odom/pub_odom_link", pub_odom_link);
+  ros::ServiceServer service_setstatic_link   = n.advertiseService("gazebo_odom/pub_odom_static_link", pub_odom_static_link);
   
   nav_msgs::Odometry odom;
   std_msgs::Header header;
@@ -58,6 +65,12 @@ int main(int argc, char **argv)
   static tf::TransformBroadcaster br;
   tf::Transform transform;
   tf::Quaternion q;
+  
+  static tf2_ros::StaticTransformBroadcaster static_broadcaster;
+  geometry_msgs::TransformStamped static_transformStamped;
+
+  
+  bool one_time=true;
   
   while (ros::ok())
   {
@@ -78,6 +91,31 @@ int main(int argc, char **argv)
         
         if(link_requested!="")
             br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"gazebo/world",link_requested));
+        
+        if(cartesian_interface_link!="")
+        {
+            if(one_time)
+            {
+                one_time=false;
+                
+                static_transformStamped.header.stamp = ros::Time::now();
+                static_transformStamped.header.frame_id = "gazebo/world";
+                static_transformStamped.child_frame_id = cartesian_interface_link;
+                
+                static_transformStamped.transform.translation.x = result.pose.position.x;
+                static_transformStamped.transform.translation.y = result.pose.position.y;
+                static_transformStamped.transform.translation.z = result.pose.position.z;
+                
+               
+                static_transformStamped.transform.rotation.x = result.pose.orientation.x;
+                static_transformStamped.transform.rotation.y = result.pose.orientation.y;
+                static_transformStamped.transform.rotation.z = result.pose.orientation.z;
+                static_transformStamped.transform.rotation.w = result.pose.orientation.w;
+                
+                static_broadcaster.sendTransform(static_transformStamped);
+            }
+        }
+     
         
         odom.pose.pose= result.pose;
         odom.twist.twist = result.twist;
