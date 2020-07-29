@@ -9,6 +9,11 @@ project(gazebo_odometry)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS tf roscpp std_msgs nav_msgs gazebo_msgs message_generation)
 
+find_package(cartesian_interface REQUIRED)
+find_package(OpenSoT REQUIRED)
+find_package(XBotInterface REQUIRED)
+
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -108,10 +113,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
-)
+include_directories(/usr/include/eigen3)   
+
+include_directories(${cartesian_interface_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -142,6 +146,10 @@ add_executable(${PROJECT_NAME} src/odometry.cpp)
 target_link_libraries(${PROJECT_NAME}
 ${catkin_LIBRARIES}
 )
+
+add_executable(reset_world_odometry src/reset_world_odometry.cpp)
+
+target_link_libraries(reset_world_odometry ${catkin_LIBRARIES} ${cartesian_interface_LIBRARIES})
 
 #############
 ## Install ##
