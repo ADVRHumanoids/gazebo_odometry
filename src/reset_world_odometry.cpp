@@ -11,11 +11,16 @@ static tf::StampedTransform w1_T_r1, w1_T_r2,trasf_reset;
 
 bool service_reset_world(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res) {
 
- cout << " x1: " << w1_T_r1.getOrigin().getX() << " y1: " << w1_T_r1.getOrigin().getY() << " z1: " << w1_T_r1.getOrigin().getZ() << endl;
- cout << " x2: " << w1_T_r2.getOrigin().getX() << " y2: " << w1_T_r2.getOrigin().getY() << " z2: " << w1_T_r2.getOrigin().getZ() << endl;
- //trasf_reset.setOrigin(tf::Vector3(w1_T_r1.getOrigin().getX()-w1_T_r2.getOrigin().getX(),w1_T_r1.getOrigin().getY()-w1_T_r2.getOrigin().getY(),w1_T_r1.getOrigin().getZ()-w1_T_r2.getOrigin().getZ()));
- trasf_reset.setData(w1_T_r2.inverse()*w1_T_r1);
- cout << " xe: " << trasf_reset.getOrigin().getX() << " ye: " << trasf_reset.getOrigin().getY() << " ze: " << trasf_reset.getOrigin().getZ() << endl;
+ cout << " xp1: " << w1_T_r1.getOrigin().getX() << " yp1: " << w1_T_r1.getOrigin().getY() << " zp1: " << w1_T_r1.getOrigin().getZ() << endl;
+ cout << " xo1: " << w1_T_r1.getRotation().getX() << " yo1: " << w1_T_r1.getRotation().getY() << " zo1: " << w1_T_r1.getRotation().getZ() << " w1: " << w1_T_r1.getRotation().getW() << endl;
+ cout << " xp2: " << w1_T_r2.getOrigin().getX() << " yp2: " << w1_T_r2.getOrigin().getY() << " zp2: " << w1_T_r2.getOrigin().getZ() << endl;
+ cout << " xo2: " << w1_T_r2.getRotation().getX() << " yo2: " << w1_T_r2.getRotation().getY() << " zo2: " << w1_T_r2.getRotation().getZ() << " w2: " << w1_T_r2.getRotation().getW() << endl;
+
+ trasf_reset.setData(w1_T_r1.inverse()*w1_T_r2);
+ 
+ cout << " xpe: " << trasf_reset.getOrigin().getX() << " ype: " << trasf_reset.getOrigin().getY() << " zpe: " << trasf_reset.getOrigin().getZ() << endl;
+ cout << " xeo: " << trasf_reset.getRotation().getX() << " yeo: " << trasf_reset.getRotation().getY() << " zoe: " << trasf_reset.getRotation().getZ() << " we: " << trasf_reset.getRotation().getW() << endl;
+ 
  reset_request=true;
  return true;
 }
@@ -59,16 +64,14 @@ int main(int argc, char **argv)
             reset_request=false;
             
             rst_world.request.new_world.position.x=trasf_reset.getOrigin().getX();
-            rst_world.request.new_world.position.y=0.0-trasf_reset.getOrigin().getY();
-            rst_world.request.new_world.position.z=0.0-trasf_reset.getOrigin().getZ();
-
-        
-        rst_world.request.new_world.orientation.w =1;
-        rst_world.request.new_world.orientation.x =0;
-        rst_world.request.new_world.orientation.y =0;
-        rst_world.request.new_world.orientation.z =0;
-        
-        client.call(rst_world);    
+            rst_world.request.new_world.position.y=trasf_reset.getOrigin().getY();
+            rst_world.request.new_world.position.z=trasf_reset.getOrigin().getZ();
+            rst_world.request.new_world.orientation.w =trasf_reset.getRotation().getW();
+            rst_world.request.new_world.orientation.x =trasf_reset.getRotation().getX();
+            rst_world.request.new_world.orientation.y =trasf_reset.getRotation().getY();
+            rst_world.request.new_world.orientation.z =trasf_reset.getRotation().getZ();
+            client.call(rst_world);
+            
         }
 
 
