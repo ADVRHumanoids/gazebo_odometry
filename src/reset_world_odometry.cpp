@@ -61,11 +61,11 @@ int main(int argc, char **argv)
  
             cout << " xpe: " << trasf_reset.getOrigin().getX() << " ype: " << trasf_reset.getOrigin().getY() << " zpe: " << trasf_reset.getOrigin().getZ() << endl;
             cout << " xeo: " << trasf_reset.getRotation().getX() << " yeo: " << trasf_reset.getRotation().getY() << " zoe: " << trasf_reset.getRotation().getZ() << " we: " << trasf_reset.getRotation().getW() << endl;        
-            
+            /*
             if((abs(trasf_reset.getOrigin().getX()) <= 0.001)&&(abs(trasf_reset.getOrigin().getY()) <= 0.001)&&(abs(trasf_reset.getOrigin().getZ()) <= 0.001))
                 if((abs(trasf_reset.getRotation().getX()) <= 0.001)&&(abs(trasf_reset.getRotation().getY()) <= 0.001)&&(abs(trasf_reset.getRotation().getZ()) <= 0.001))
-                    if((trasf_reset.getRotation().getW() >= 0.95)&&(trasf_reset.getRotation().getW() <=1))
-                        reset_request=false;
+                    if((trasf_reset.getRotation().getW() >= 0.95)&&(trasf_reset.getRotation().getW() <=1))*/
+                        //reset_request=false;
             
             if(reset_request)
             {
@@ -78,6 +78,7 @@ int main(int argc, char **argv)
             rst_world.request.new_world.orientation.z =trasf_reset.getRotation().getZ();
             client.call(rst_world);
             }
+            reset_request=false;
             
         }
 
